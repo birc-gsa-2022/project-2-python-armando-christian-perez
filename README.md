@@ -14,13 +14,16 @@ Implement the tool `st` that does exact pattern matching using a suffix tree. Te
 # Report
 
 ## Specify if you have used a linear time or quadratic time algorithm.
+Linear
 
 ## Insights you may have had while implementing and comparing the algorithms.
+That suffix trees allow us to find all patterns in a string by isolating the subtree for which all leafs are suffixes of the string suffixes, so that pattern + subtree suffix equals all suffixes of the string that includes the pattern as a prefix.
 
 ## Problems encountered if any.
+Many.
 
 ## Correctness
-
+I've run suffix tree construction on many types of strings, including the two analyzed in https://www.youtube.com/watch?v=aPRqocoBsFQ. These trees ive confirmed looked exactly like the ones in the video. I've also made two function for extracting and printing all the suffixes from shortest to longest from the leaf nodes (by first getting the suffixes and then sorting them, nothing fancy).
 *Describe experiments that verifies the correctness of your implementations.*
 
 ## Running time
