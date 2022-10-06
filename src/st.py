@@ -59,7 +59,6 @@ def suffix_tree(string):
         while remaining > 0:
             if edge_length:
                 edge_char = string[active_edge]
-                print(active_node, edge_char, i, remaining, "\n")
                 matched_node = tree_list[active_node.children[edge_char]]
                 if matched_node.index[1] is not None and matched_node.index[1] < (matched_node.index[0] + edge_length): # We have to jump an internal node
                     internal_node_length = matched_node.index[1] - matched_node.index[0] + 1
@@ -257,8 +256,7 @@ def matches_to_SAM(read_file, reference_file):
 def print_SAM(SAM):
     for i in range(len(SAM[0])):
         sys.stdout.write(SAM[0][i] + "\t" + SAM[1][i] + "\t" + str(SAM[2][i]) + "\t" + SAM[3][i] + "\t" + SAM[4][i] + "\n")
-#suffix_tree("ssissipssissip")
-#print("hi")
+
 SAM = matches_to_SAM(args.reads, args.genome)
 
 print_SAM(SAM)
