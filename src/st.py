@@ -255,18 +255,7 @@ def matches_to_SAM(read_file, reference_file):
 def print_SAM(SAM):
     for i in range(len(SAM[0])):
         sys.stdout.write(SAM[0][i] + "\t" + SAM[1][i] + "\t" + str(SAM[2][i]) + "\t" + SAM[3][i] + "\t" + SAM[4][i] + "\n")
-#string = "aa"
-string = "mississippi"
-tree = suffix_tree(string*2)
-#print(tree)
-#print(suffix_tree_match(string*2, string, tree))
-#print(tree)
-#another = get_indexes(tree)
-#patterns = extract_patterns(another, string)
-#print(tree)
-#for i in patterns:
-#    print(i)
-#print("hi")
+
 SAM = matches_to_SAM(args.reads, args.genome)
 
 print_SAM(SAM)
