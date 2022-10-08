@@ -53,16 +53,18 @@ def suffix_tree(string):
     active_node = tree_list[0]
     string = string + "0"
     for i in range(len(string)):
-        remaining += 1
         suffix_link_update = None
+        remaining += 1
         current_char = string[i]
         while remaining > 0:
+
             if edge_length:
                 edge_char = string[active_edge]
                 matched_node = tree_list[active_node.children[edge_char]]
                 if matched_node.index[1] is not None and matched_node.index[1] < (matched_node.index[0] + edge_length): # We have to jump an internal node
                     internal_node_length = matched_node.index[1] - matched_node.index[0] + 1
-                    if internal_node_length < edge_length: # We have to jump past the internal node to begin matching
+
+                    if internal_node_length < edge_length: # We have to a child of the internal node to begin matching
                         active_node = matched_node
                         active_edge += internal_node_length
                         edge_length -= internal_node_length
@@ -78,7 +80,8 @@ def suffix_tree(string):
 
                         else: # we can't extend from the internal node
 
-                            newnode = node(index = [i, None], parent = matched_node.self_pointer, self_pointer = len(tree_list), leaf_start = i - remaining + 1)
+                            newnode = node(index = [i, None], parent = matched_node.self_pointer, self_pointer = len(tree_list),
+                                leaf_start = i - remaining + 1)
                             tree_list.append(newnode)
                             tree_list[matched_node.self_pointer].children[current_char] = len(tree_list) - 1
                             if suffix_link_update:
@@ -100,30 +103,26 @@ def suffix_tree(string):
 
                     else: # there is no match
 
-                        internal_node_index = matched_node.self_pointer
-
-                        newnode = node(index = [matched_node.index[0] + edge_length, matched_node.index[1]], parent = internal_node_index,
-                            self_pointer = len(tree_list), children = matched_node.children, leaf_start = tree_list[internal_node_index].leaf_start) # Creates the node that was previously found in the old node
-                        tree_list[internal_node_index].leaf_start = None
+                        newnode = node(index = [matched_node.index[0], matched_node.index[0] + edge_length - 1], parent = active_node.self_pointer,
+                            self_pointer = len(tree_list), suffix_link = 0)
+                            # creates a new internal node which has the old matched node or leaf as its child
+                        internal_node_index = newnode.self_pointer
+                        newnode.children[string[matched_node.index[0] + edge_length]] = matched_node.self_pointer
+                        tree_list[matched_node.self_pointer].parent = internal_node_index
 
                         tree_list.append(newnode)
-                        tree_list[internal_node_index].children = dict()
-                        for j in tree_list[newnode.self_pointer].children:
-                            tree_list[newnode.children[j]].parent = newnode.self_pointer
+                        tree_list[active_node.self_pointer].children[string[newnode.index[0]]] = internal_node_index
+                        tree_list[matched_node.self_pointer].index[0] = newnode.index[1] + 1
 
-                        tree_list[internal_node_index].children[string[newnode.index[0]]] = newnode.self_pointer
-                        
-                        if tree_list[internal_node_index].suffix_link is None:
-                            tree_list[internal_node_index].suffix_link = 0
+                        if suffix_link_update:
+                            tree_list[suffix_link_update].suffix_link = internal_node_index
+                        suffix_link_update = internal_node_index
 
-                        tree_list[internal_node_index].index[1] = matched_node.index[0] + edge_length - 1
-
-                        newnode = node(index = [i, None], parent = internal_node_index, self_pointer = len(tree_list), leaf_start = i - remaining + 1) # and creates the new child
+                        newnode = node(index = [i, None], parent = internal_node_index, self_pointer = len(tree_list),
+                        leaf_start = i - remaining + 1) # and creates the new leaf
                         tree_list.append(newnode)
                         tree_list[internal_node_index].children[current_char] = newnode.self_pointer
-                        if suffix_link_update:
-                            tree_list[suffix_link_update].suffix_link = active_node.self_pointer
-                        suffix_link_update = internal_node_index
+
                         if active_node.suffix_link is not None:
                             active_node = tree_list[active_node.suffix_link]
                         else:
@@ -146,7 +145,7 @@ def suffix_tree(string):
                     remaining -= 1
     return tree_list
 
-def traverse_tree(tree_list): # test function
+def get_indexes(tree_list): # test function
     path_list = []
     visited_leafs = []
     while tree_list:
@@ -191,10 +190,10 @@ def search_tree(tree_list, pattern, string):
             active_node = tree_list[active_node.children[i]]
             edge_length = 1
             if active_node.index[1] is None:
-                active_node.index[1] = str_len
+                active_node.index[1] = str_len - 1
         elif edge_length is None:
             return None
-        elif edge_length > (active_node.index[0] - active_node.index[1]):
+        elif edge_length > (active_node.index[1] - active_node.index[0]):
             if i in active_node.children: # Should be a "repeat current iteration" keyword in python
                 active_node = tree_list[active_node.children[i]] # then i would just set edge length to none and repeat
                 edge_length = 1
@@ -213,13 +212,13 @@ def traverse_tree(tree_list, subtree_start):
         return []
     matches = []
     queue = deque([subtree_start])
-    while queue: # While queue should work, but it doesnt?
+    while queue:
         current = queue.popleft()
         if tree_list[current].children:
             for i in tree_list[current].children:
                 queue.append(tree_list[current].children[i])
         else:
-            matches.append(tree_list[current].leaf_start + 1)
+            matches.append(tree_list[current].leaf_start)
     return matches
 
 def suffix_tree_match(string, pattern, tree_list):
@@ -256,7 +255,18 @@ def matches_to_SAM(read_file, reference_file):
 def print_SAM(SAM):
     for i in range(len(SAM[0])):
         sys.stdout.write(SAM[0][i] + "\t" + SAM[1][i] + "\t" + str(SAM[2][i]) + "\t" + SAM[3][i] + "\t" + SAM[4][i] + "\n")
-
+#string = "aa"
+string = "mississippi"
+tree = suffix_tree(string*2)
+#print(tree)
+#print(suffix_tree_match(string*2, string, tree))
+#print(tree)
+#another = get_indexes(tree)
+#patterns = extract_patterns(another, string)
+#print(tree)
+#for i in patterns:
+#    print(i)
+#print("hi")
 SAM = matches_to_SAM(args.reads, args.genome)
 
 print_SAM(SAM)
