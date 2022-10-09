@@ -133,7 +133,6 @@ def suffix_tree(string):
             else: #There is no active edge
                 
                 assert active_node.self_pointer == 0
-                assert remaining == 1
                 if current_char in active_node.children.keys(): # We can extend from root
                     active_edge = tree_list[active_node.children[current_char]].index[0]
                     edge_length = 1
