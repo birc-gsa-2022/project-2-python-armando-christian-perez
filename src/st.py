@@ -134,18 +134,19 @@ def suffix_tree(string):
             else: #There is no active edge
                 
                 assert active_node.self_pointer == 0
-                if remaining == 1: # remaining is either 0 or 1
-                    if current_char in active_node.children.keys(): # We can extend from root
-                        active_edge = tree_list[active_node.children[current_char]].index[0]
-                        edge_length = 1
-                        if suffix_link_update:
-                            tree_list[suffix_link_update].suffix_link = active_node.self_pointer
-                        break
-                    else: # we cant extend from root
-                        newnode = node(index = [i, None], parent = 0, self_pointer = len(tree_list), leaf_start = i - remaining + 1)
-                        tree_list.append(newnode)
-                        tree_list[0].children[current_char] = len(tree_list) - 1
-                        remaining -= 1
+                if current_char in active_node.children.keys(): # We can extend from root
+                    active_edge = tree_list[active_node.children[current_char]].index[0]
+                    edge_length = 1
+                    if suffix_link_update:
+                        tree_list[suffix_link_update].suffix_link = active_node.self_pointer
+                    break
+                else: # we cant extend from root
+                    newnode = node(index = [i, None], parent = active_node.self_pointer, self_pointer = len(tree_list), leaf_start = i - remaining + 1)
+                    tree_list.append(newnode)
+                    tree_list[active_node.self_pointer].children[current_char] = len(tree_list) - 1
+                    remaining -= 1
+                    if suffix_link_update:
+                        tree_list[suffix_link_update].suffix_link = active_node.self_pointer
     return tree_list
 
 def get_indexes(tree_list): # test function
