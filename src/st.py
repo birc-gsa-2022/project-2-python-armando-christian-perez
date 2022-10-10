@@ -53,18 +53,18 @@ def suffix_tree(string):
     active_node = tree_list[0]
     string = string + "0"
     for i in range(len(string)):
-        suffix_link_update = None
         remaining += 1
         current_char = string[i]
-        while remaining > 0:
-
-            if edge_length:
+        suffix_link_update = None
+        while remaining > 0: # Not sure if this is spaghetti code, if there are some good code practices i break here please lemme know
+            if edge_length: # there is an active edge
                 edge_char = string[active_edge]
                 matched_node = tree_list[active_node.children[edge_char]]
+
                 if matched_node.index[1] is not None and matched_node.index[1] < (matched_node.index[0] + edge_length): # We have to jump an internal node
                     internal_node_length = matched_node.index[1] - matched_node.index[0] + 1
 
-                    if internal_node_length < edge_length: # We have to a child of the internal node to begin matching
+                    if internal_node_length < edge_length: # We have to go to a child of the internal node to begin matching
                         active_node = matched_node
                         active_edge += internal_node_length
                         edge_length -= internal_node_length
@@ -76,6 +76,8 @@ def suffix_tree(string):
                             matched_node = tree_list[active_node.children[current_char]]
                             active_edge = matched_node.index[0]
                             edge_length = 1
+                            if suffix_link_update:
+                                tree_list[suffix_link_update].suffix_link = active_node.self_pointer
                             break
 
                         else: # we can't extend from the internal node
@@ -90,6 +92,7 @@ def suffix_tree(string):
                             remaining -= 1
                             if active_node.suffix_link is not None:
                                 active_node = tree_list[active_node.suffix_link]
+
                             else:
                                 active_edge += 1
                                 edge_length -= 1
@@ -102,7 +105,6 @@ def suffix_tree(string):
                         break
 
                     else: # there is no match
-
                         newnode = node(index = [matched_node.index[0], matched_node.index[0] + edge_length - 1], parent = active_node.self_pointer,
                             self_pointer = len(tree_list), suffix_link = 0)
                             # creates a new internal node which has the old matched node or leaf as its child
@@ -122,26 +124,28 @@ def suffix_tree(string):
                         leaf_start = i - remaining + 1) # and creates the new leaf
                         tree_list.append(newnode)
                         tree_list[internal_node_index].children[current_char] = newnode.self_pointer
-
+                        remaining -= 1
                         if active_node.suffix_link is not None:
                             active_node = tree_list[active_node.suffix_link]
                         else:
                             active_edge += 1
                             edge_length -= 1
                             active_node == tree_list[0]
-                        remaining -= 1
             else: #There is no active edge
                 
                 assert active_node.self_pointer == 0
-                if current_char in active_node.children.keys(): # We can extend from root
-                    active_edge = tree_list[active_node.children[current_char]].index[0]
-                    edge_length = 1
-                    break
-                else: # we cant extend from root
-                    newnode = node(index = [i, None], parent = 0, self_pointer = len(tree_list), leaf_start = i - remaining + 1)
-                    tree_list.append(newnode)
-                    tree_list[0].children[current_char] = len(tree_list) - 1
-                    remaining -= 1
+                if remaining == 1: # remaining is either 0 or 1
+                    if current_char in active_node.children.keys(): # We can extend from root
+                        active_edge = tree_list[active_node.children[current_char]].index[0]
+                        edge_length = 1
+                        if suffix_link_update:
+                            tree_list[suffix_link_update].suffix_link = active_node.self_pointer
+                        break
+                    else: # we cant extend from root
+                        newnode = node(index = [i, None], parent = 0, self_pointer = len(tree_list), leaf_start = i - remaining + 1)
+                        tree_list.append(newnode)
+                        tree_list[0].children[current_char] = len(tree_list) - 1
+                        remaining -= 1
     return tree_list
 
 def get_indexes(tree_list): # test function
