@@ -28,6 +28,8 @@ I've run suffix tree construction on many types of strings, including the two an
 
 ## Running time
 
+
+
 *Describe experiments that verifies that your implementation of `st` uses no more time than O(n) or O(n²) (depending on the algorithm) for constructing the suffix tree and no more than O(m) for searching for a given read in it. Remember to explain your choice of test data. What are “best” and “worst” case inputs?*
 
 *If you have graphs that show the running time--you probably should have--you can embed them here like we did in the previous project.*
