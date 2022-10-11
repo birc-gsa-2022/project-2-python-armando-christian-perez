@@ -28,9 +28,14 @@ I've run suffix tree construction on many types of strings, including the two an
 
 ## Running time
 
+![](suffix_construction_b.png)
 
+![](suffix_construction_dna.png)
 
-*Describe experiments that verifies that your implementation of `st` uses no more time than O(n) or O(n²) (depending on the algorithm) for constructing the suffix tree and no more than O(m) for searching for a given read in it. Remember to explain your choice of test data. What are “best” and “worst” case inputs?*
+![](suffix_match_b.png)
 
-*If you have graphs that show the running time--you probably should have--you can embed them here like we did in the previous project.*
+![](Suffix_match_DNA.png)
 
+I ran my suffix tree construction algorithm and my suffix tree match algorithm for several string of either DNA vocabulary (ACTG) or all b's.
+As can be seen on the graphs, the all b's match algorithm has a constant high amount of running time, as there are a lot of matches to output, while the DNA actually decreases the longer the pattern gets, as there should be substantially fewer matches for a longer string (in fact, as the string is random, on average, the amount of matches should be quartered for each extension of m).
+For the construction algorithm no real difference is seen between the two types of data, but it is clear that the data increases linearly with the size of the string, as we expected, and that is just great.
