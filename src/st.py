@@ -184,6 +184,13 @@ def extract_patterns(path_list, string): # test function
     suffixes.sort(key = len)
     return suffixes
 
+def test_tree(string): # test function
+    st = suffix_tree(string)
+    indexes = get_indexes(st)
+    patterns = extract_patterns(indexes, string)
+    for i in patterns:
+        print(i)
+
 def search_tree(tree_list, pattern, string):
     edge_length = None
     active_node = tree_list[0]
@@ -205,6 +212,8 @@ def search_tree(tree_list, pattern, string):
                     active_node.index[1] = str_len
             else:
                 return None
+        elif (active_node.index[0] + edge_length) >= str_len:
+            return None
         elif i == string[active_node.index[0] + edge_length]:
             edge_length += 1
         else:
